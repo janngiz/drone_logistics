@@ -3,6 +3,7 @@ package com.musala.drones.services;
 import com.musala.drones.entities.Medication;
 import com.musala.drones.exceptions.ValidationException;
 import com.musala.drones.repo.MedicationRepository;
+import com.musala.drones.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,9 +29,17 @@ public class MedicationService {
         }
     }
 
+    private boolean isJPEG(MultipartFile file) {
+        return file.getContentType() != null && file.getContentType().equalsIgnoreCase("image/jpeg");
+    }
+
     public Medication saveMedication(String name, String weight, String code, MultipartFile file) {
         try {
             createUploadDirectoryIfNotExists();
+
+            if (file != null && !file.isEmpty() && !isJPEG(file)) {
+                throw new ValidationException("Only JPEG images are allowed.");
+            }
 
             if (!isWeightValid(weight)) {
                 throw new ValidationException("Weight is not number.");
@@ -47,7 +56,7 @@ public class MedicationService {
                 String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
                 Path filePath = Path.of(UPLOAD_DIRECTORY, fileName);
                 Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-                imageUrl = "/uploads/" + fileName;
+                imageUrl = fileName;
             }
 
             Medication medication = new Medication(UUID.randomUUID().toString(), name, weightDouble, code, imageUrl);
@@ -56,6 +65,13 @@ public class MedicationService {
             throw new ValidationException(e.getMessage());
         }
 
+    }
+
+    public Medication getMedicationById(String medicationId) {
+        if (StringUtils.isNullOrEmpty(medicationId)) {
+            throw new ValidationException("Drone id cannot be null or empty");
+        }
+        return medicationRepository.findById(medicationId).orElse(null);
     }
 
     public boolean isValidCode(String code) {

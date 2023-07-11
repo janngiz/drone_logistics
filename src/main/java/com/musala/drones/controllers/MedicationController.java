@@ -1,20 +1,19 @@
 package com.musala.drones.controllers;
 
+import com.musala.drones.domain.MedicationResponse;
 import com.musala.drones.entities.Medication;
 import com.musala.drones.services.MedicationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import javax.validation.constraints.NotNull;
-
-
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @RestController
 @RequestMapping("/medication")
@@ -27,10 +26,47 @@ public class MedicationController {
     @PostMapping("/save")
     public ResponseEntity<Medication> saveMedication(@RequestParam(value = "file", required = false) MultipartFile file,
                                                      @RequestParam("name") String name,
-                                                     @RequestParam("weight") @NotNull String weight,
+                                                     @RequestParam("weight") String weight,
                                                      @RequestParam("code") String code) {
         Medication savedMedication = medicationService.saveMedication(name, weight, code, file);
         return ResponseEntity.ok(savedMedication);
+    }
+
+    @GetMapping("/{medicationId}")
+    public ResponseEntity<MedicationResponse> getMedication(@PathVariable String medicationId) {
+        Medication medication = medicationService.getMedicationById(medicationId);
+
+        if (medication != null) {
+            MedicationResponse medicationResponse = new MedicationResponse(medication.getName(), medication.getWeight(),
+                    medication.getCode(), getImageUrl(medication.getImage()));
+            return ResponseEntity.ok(medicationResponse);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+        @GetMapping("/image/{fileName:.+}")
+        public ResponseEntity<Resource> getImage(@PathVariable String fileName) {
+            try {
+                Path imagePath = Paths.get("uploads", fileName);
+                Resource imageResource = new UrlResource(imagePath.toUri());
+
+                if (imageResource.exists() && imageResource.isReadable()) {
+                    return ResponseEntity.ok()
+                            .contentType(MediaType.IMAGE_JPEG)
+                            .body(imageResource);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return ResponseEntity.notFound().build();
+        }
+
+
+    private String getImageUrl(String imagePath) {
+        if (imagePath != null && !imagePath.isBlank()) {
+            return "/medication/image/" + imagePath;
+        }
+        return null;
     }
 
 
