@@ -1,7 +1,8 @@
 package com.musala.drones.services;
 
 import com.musala.drones.entities.Drone;
-import com.musala.drones.exceptions.CustomException;
+import com.musala.drones.exceptions.NotFoundException;
+import com.musala.drones.exceptions.ValidationException;
 import com.musala.drones.repo.DroneRepository;
 import com.musala.drones.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ public class DroneService {
     public Drone saveDrone(Drone drone) {
 
         if (StringUtils.isNullOrEmpty(drone.getSerialNumber())) {
-            throw new CustomException("Drone serial number cannot be null or empty");
+            throw new ValidationException("Drone serial number cannot be null or empty");
         }
 
         drone.setId(UUID.randomUUID().toString());
@@ -30,13 +31,13 @@ public class DroneService {
 
     public Drone getDroneById(String id) {
         if (StringUtils.isNullOrEmpty(id)) {
-            throw new CustomException("Drone id cannot be null or empty");
+            throw new NotFoundException("Drone id cannot be null or empty");
         }
         Optional<Drone> optionalDrone = droneRepository.findById(id);
         if (optionalDrone.isPresent()) {
             return optionalDrone.get();
         } else {
-            throw new CustomException("Drone not found with id: " + id);
+            throw new NotFoundException("Drone not found with id: " + id);
         }
     }
 
@@ -46,7 +47,7 @@ public class DroneService {
 
     public Drone updateDrone(String id, Drone updatedDrone) {
         if (StringUtils.isNullOrEmpty(id)) {
-            throw new CustomException("Drone id cannot be null or empty");
+            throw new ValidationException("Drone id cannot be null or empty");
         }
         Optional<Drone> optionalDrone = droneRepository.findById(id);
         if (optionalDrone.isPresent()) {
@@ -59,7 +60,7 @@ public class DroneService {
 
             return droneRepository.save(drone);
         } else {
-                throw new CustomException("Drone not found with id: " + id);
+                throw new NotFoundException("Drone not found with id: " + id);
         }
     }
 
