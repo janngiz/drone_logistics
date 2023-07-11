@@ -10,6 +10,6 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<String> handleCustomException(CustomException ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 }

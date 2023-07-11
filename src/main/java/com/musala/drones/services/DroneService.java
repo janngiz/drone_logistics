@@ -3,9 +3,12 @@ package com.musala.drones.services;
 import com.musala.drones.entities.Drone;
 import com.musala.drones.exceptions.CustomException;
 import com.musala.drones.repo.DroneRepository;
+import com.musala.drones.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -16,7 +19,7 @@ public class DroneService {
 
     public Drone saveDrone(Drone drone) {
 
-        if (drone.getSerialNumber() == null || drone.getSerialNumber().isEmpty()) {
+        if (StringUtils.isNullOrEmpty(drone.getSerialNumber())) {
             throw new CustomException("Drone serial number cannot be null or empty");
         }
 
@@ -24,5 +27,43 @@ public class DroneService {
 
         return droneRepository.save(drone);
     }
+
+    public Drone getDroneById(String id) {
+        if (StringUtils.isNullOrEmpty(id)) {
+            throw new CustomException("Drone id cannot be null or empty");
+        }
+        Optional<Drone> optionalDrone = droneRepository.findById(id);
+        if (optionalDrone.isPresent()) {
+            return optionalDrone.get();
+        } else {
+            throw new CustomException("Drone not found with id: " + id);
+        }
+    }
+
+    public List<Drone> getAllDrones(){
+       return droneRepository.findAll();
+    }
+
+    public Drone updateDrone(String id, Drone updatedDrone) {
+        if (StringUtils.isNullOrEmpty(id)) {
+            throw new CustomException("Drone id cannot be null or empty");
+        }
+        Optional<Drone> optionalDrone = droneRepository.findById(id);
+        if (optionalDrone.isPresent()) {
+            Drone drone = optionalDrone.get();
+            drone.setSerialNumber(updatedDrone.getSerialNumber());
+            drone.setModel(updatedDrone.getModel());
+            drone.setWeightLimit(updatedDrone.getWeightLimit());
+            drone.setBatteryCapacity(updatedDrone.getBatteryCapacity());
+            drone.setState(updatedDrone.getState());
+
+            return droneRepository.save(drone);
+        } else {
+                throw new CustomException("Drone not found with id: " + id);
+        }
+    }
+
+
+
 
 }
