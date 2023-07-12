@@ -19,4 +19,11 @@ public class LogisticController {
         DroneMedications droneMedications = logisticService.loadMedicationsOnDrone(droneId, medicationIds);
         return ResponseEntity.ok(droneMedications);
     }
+
+    @PostMapping("/deliver/medications/drone/{droneId}")
+    public ResponseEntity<DroneMedications> deliverMedication(@PathVariable String droneId) {
+        DroneMedications droneMedications = logisticService.deliverMedication(droneId);
+        return ResponseEntity.ok(droneMedications);
+    }
+
 }

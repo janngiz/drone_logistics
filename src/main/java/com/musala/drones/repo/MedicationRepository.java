@@ -8,5 +8,7 @@ import java.util.List;
 public interface MedicationRepository extends JpaRepository<Medication, String> {
 
     List<Medication> findAllByIdAndIsDeliveredFalse(List<String> ids);
+    List<Medication> findByDroneId(String droneId);
+
 
 }
