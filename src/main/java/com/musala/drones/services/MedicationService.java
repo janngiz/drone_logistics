@@ -1,6 +1,7 @@
 package com.musala.drones.services;
 
 import com.musala.drones.entities.Medication;
+import com.musala.drones.exceptions.NotFoundException;
 import com.musala.drones.exceptions.ValidationException;
 import com.musala.drones.repo.MedicationRepository;
 import com.musala.drones.utils.StringUtils;
@@ -13,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -21,17 +23,6 @@ public class MedicationService {
     @Autowired
     private MedicationRepository medicationRepository;
 
-
-    private void createUploadDirectoryIfNotExists() throws IOException, IOException {
-        Path uploadPath = Paths.get(UPLOAD_DIRECTORY);
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
-        }
-    }
-
-    private boolean isJPEG(MultipartFile file) {
-        return file.getContentType() != null && file.getContentType().equalsIgnoreCase("image/jpeg");
-    }
 
     public Medication saveMedication(String name, String weight, String code, MultipartFile file) {
         try {
@@ -69,9 +60,70 @@ public class MedicationService {
 
     public Medication getMedicationById(String medicationId) {
         if (StringUtils.isNullOrEmpty(medicationId)) {
-            throw new ValidationException("Drone id cannot be null or empty");
+            throw new ValidationException("Medication id cannot be null or empty");
         }
         return medicationRepository.findById(medicationId).orElse(null);
+    }
+
+    public List<Medication> getAllMedications() {
+        return medicationRepository.findAll();
+    }
+
+
+    public Medication updateMedication(String id, String name, String weight, String code, MultipartFile file) {
+        try {
+            if (StringUtils.isNullOrEmpty(id)) {
+                throw new ValidationException("Medication id cannot be null or empty");
+            }
+
+            Medication medication = medicationRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundException("Medication not found with id: " + id));
+
+
+            if (file != null && !file.isEmpty() && !isJPEG(file)) {
+                throw new ValidationException("Only JPEG images are allowed.");
+            }
+
+            if (!isWeightValid(weight)) {
+                throw new ValidationException("Weight is not number.");
+
+            }
+            double weightDouble = Double.parseDouble(weight);
+
+            if (!isValidCode(code)) {
+                throw new ValidationException("Code is not valid.");
+            }
+
+            medication.setName(name);
+            medication.setWeight(weightDouble);
+            medication.setCode(code);
+
+            // Update the image if provided
+            String imageUrl;
+            if (file != null) {
+                String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+                Path filePath = Path.of(UPLOAD_DIRECTORY, fileName);
+                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+                imageUrl = fileName;
+                medication.setImage(imageUrl);
+            }
+
+            return medicationRepository.save(medication);
+        } catch (Exception e) {
+            throw new ValidationException(e.getMessage());
+        }
+    }
+
+
+    private void createUploadDirectoryIfNotExists() throws IOException, IOException {
+        Path uploadPath = Paths.get(UPLOAD_DIRECTORY);
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+    }
+
+    private boolean isJPEG(MultipartFile file) {
+        return file.getContentType() != null && file.getContentType().equalsIgnoreCase("image/jpeg");
     }
 
     public boolean isValidCode(String code) {
