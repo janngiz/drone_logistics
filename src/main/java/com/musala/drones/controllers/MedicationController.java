@@ -23,7 +23,7 @@ public class MedicationController {
     @Autowired
     private MedicationService medicationService;
 
-    @PostMapping("/save")
+    @PostMapping(value ="/save",consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Medication> saveMedication(@RequestParam(value = "file", required = false) MultipartFile file,
                                                      @RequestParam("name") String name,
                                                      @RequestParam("weight") String weight,
@@ -32,7 +32,7 @@ public class MedicationController {
         return ResponseEntity.ok(savedMedication);
     }
 
-    @GetMapping("/{medicationId}")
+    @GetMapping(value = "/{medicationId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MedicationResponse> getMedication(@PathVariable String medicationId) {
         Medication medication = medicationService.getMedicationById(medicationId);
 
@@ -44,13 +44,13 @@ public class MedicationController {
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/all")
+    @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Medication>> getAllMedications() {
         List<Medication> medications = medicationService.getAllMedications();
         return ResponseEntity.ok(medications);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Medication> updateMedication(@PathVariable("id") String id,
                                                        @RequestParam(value = "file", required = false) MultipartFile file,
                                                        @RequestParam("name") String name,
