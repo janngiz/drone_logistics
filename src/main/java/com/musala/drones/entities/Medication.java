@@ -24,8 +24,29 @@ public class Medication {
 
     @Column(name = "image")
     private String image;
+    @Column(name = "drone_id")
+    private String droneId;
+
+    @Column(name = "is_delivered")
+    private boolean isDelivered;
 
     public Medication() {
+    }
+
+    public String getDroneId() {
+        return droneId;
+    }
+
+    public void setDroneId(String droneId) {
+        this.droneId = droneId;
+    }
+
+    public boolean isDelivered() {
+        return isDelivered;
+    }
+
+    public void setDelivered(boolean delivered) {
+        isDelivered = delivered;
     }
 
     public String getId() {

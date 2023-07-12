@@ -31,13 +31,13 @@ public class DroneService {
 
     public Drone getDroneById(String id) {
         if (StringUtils.isNullOrEmpty(id)) {
-            throw new NotFoundException("Drone id cannot be null or empty");
+            throw new ValidationException("Drone id cannot be null or empty");
         }
         Optional<Drone> optionalDrone = droneRepository.findById(id);
         if (optionalDrone.isPresent()) {
             return optionalDrone.get();
         } else {
-            throw new NotFoundException("Drone not found with id: " + id);
+            throw new ValidationException("Drone not found with id: " + id);
         }
     }
 
@@ -63,6 +63,9 @@ public class DroneService {
                 throw new NotFoundException("Drone not found with id: " + id);
         }
     }
+
+
+
 
 
 
