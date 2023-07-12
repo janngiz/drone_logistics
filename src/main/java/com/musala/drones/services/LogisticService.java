@@ -38,16 +38,26 @@ public class LogisticService {
 
 
     }
+
     public DroneMedications deliverMedication(String droneId) {
         //check if the drone is in the loaded state or not
         Drone drone = LogisticUtils.getDrone(droneRepository, droneId);
         if (drone.getState() != DroneState.LOADED) {
             throw new ValidationException("Drone  is not in loaded state to proceed to deliver: " + droneId);
-
         }
-        List<Medication> byDroneId = medicationRepository.findByDroneId(droneId);
+        List<Medication> byDroneId = medicationRepository.findByDroneIdAndIsDeliveredFalse(droneId);
         List<Medication> deliveredMedications = setMedicationToDelivered(byDroneId);
-        return new DroneMedications(drone, deliveredMedications);
+
+        drone.setState(DroneState.DELIVERED);
+        Drone deliveredDrone = droneRepository.save(drone);
+        return new DroneMedications(deliveredDrone, deliveredMedications);
+    }
+
+
+    public List<Medication> getLoadedMedicationByDroneId(String droneId) {
+        //check the drone exists
+        LogisticUtils.getDrone(droneRepository, droneId);
+        return medicationRepository.findByDroneIdAndIsDeliveredFalse(droneId);
     }
 
     //Fetching only medications which are not delivered
