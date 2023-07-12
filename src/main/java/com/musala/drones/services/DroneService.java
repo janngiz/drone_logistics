@@ -18,10 +18,13 @@ public class DroneService {
     private DroneRepository droneRepository;
 
     public Drone saveDrone(Drone drone) {
-        if (StringUtils.isNullOrEmpty(drone.getSerialNumber())) {
-            throw new ValidationException("Drone serial number cannot be null or empty");
+        validateDrone(drone);
+        if (droneRepository.count() > 10) {
+            throw new ValidationException("Drone numbers can't exceed 10.");
+
         }
         drone.setId(UUID.randomUUID().toString());
+        drone.setWeightLimit(500);
         return droneRepository.save(drone);
     }
 
@@ -41,6 +44,20 @@ public class DroneService {
         drone.setBatteryCapacity(updatedDrone.getBatteryCapacity());
         drone.setState(updatedDrone.getState());
         return droneRepository.save(drone);
+    }
+
+    private void validateDrone(Drone drone) {
+        if (drone.getBatteryCapacity() < 0 || drone.getBatteryCapacity() > 100) {
+            throw new IllegalArgumentException("Battery capacity must be between 0 and 100");
+        }
+
+        if (StringUtils.isNullOrEmpty(drone.getSerialNumber()) ) {
+            throw new ValidationException("Drone serial number cannot be null or empty");
+        }
+
+        if (drone.getSerialNumber().length() > 100 ) {
+            throw new ValidationException("Drone serial number cannot have more than 100 characters.");
+        }
     }
 
 

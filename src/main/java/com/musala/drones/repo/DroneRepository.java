@@ -8,4 +8,7 @@ import java.util.List;
 
 public interface DroneRepository extends JpaRepository<Drone, String> {
     List<Drone> findByState(DroneState state);
+
+    long count();
+
 }
