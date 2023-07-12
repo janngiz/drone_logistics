@@ -1,6 +1,7 @@
 package com.musala.drones.controllers;
 
 import com.musala.drones.domain.DroneMedications;
+import com.musala.drones.entities.Drone;
 import com.musala.drones.entities.Medication;
 import com.musala.drones.services.LogisticService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,11 @@ public class LogisticController {
     }
 
     //todo available drones
+
+    @GetMapping("/drones/available")
+    public ResponseEntity<List<Drone>> getAvailableDronesForLoading(){
+        return null;
+    }
 
     //todo  remove the drone id and  drone state to idle  == return drone
 

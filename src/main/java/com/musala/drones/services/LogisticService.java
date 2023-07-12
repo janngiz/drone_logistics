@@ -35,8 +35,6 @@ public class LogisticService {
         drone.setState(DroneState.LOADED);
         Drone loadedDrone = droneRepository.save(drone);
         return new DroneMedications(loadedDrone, loadedMedications);
-
-
     }
 
     public DroneMedications deliverMedication(String droneId) {
@@ -58,6 +56,14 @@ public class LogisticService {
         //check the drone exists
         LogisticUtils.getDrone(droneRepository, droneId);
         return medicationRepository.findByDroneIdAndIsDeliveredFalse(droneId);
+    }
+
+
+
+    // state = idle  drones, are consider as available drones
+    public List<Drone> getAvailableDronesForLoading() {
+        return droneRepository.findByState(DroneState.IDLE);
+
     }
 
     //Fetching only medications which are not delivered
