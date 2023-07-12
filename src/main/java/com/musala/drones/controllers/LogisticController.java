@@ -34,13 +34,18 @@ public class LogisticController {
         return ResponseEntity.ok(loadedMedicationByDroneId);
     }
 
-    //todo available drones
-
     @GetMapping("/drones/available")
     public ResponseEntity<List<Drone>> getAvailableDronesForLoading(){
-        return null;
+        List<Drone> availableDronesForLoading = logisticService.getAvailableDronesForLoading();
+        return ResponseEntity.ok(availableDronesForLoading);
     }
 
-    //todo  remove the drone id and  drone state to idle  == return drone
+    @GetMapping("/drone/{droneId}/battery")
+    public ResponseEntity<Integer> getBatteryOfDrone(@PathVariable String droneId){
+        int batteryOfDrone = logisticService.getBatteryOfDrone(droneId);
+        return ResponseEntity.ok(batteryOfDrone);
+    }
+
+
 
 }

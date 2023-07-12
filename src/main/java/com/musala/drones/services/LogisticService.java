@@ -66,6 +66,12 @@ public class LogisticService {
 
     }
 
+    public int getBatteryOfDrone(String id) {
+        Drone drone = LogisticUtils.getDrone(droneRepository, id);
+        return drone.getBatteryCapacity();
+
+    }
+
     //Fetching only medications which are not delivered
     public List<Medication> getMedicationsByIdAndIsDeliveredFalse(List<String> ids) {
         return medicationRepository.findAllByIdAndIsDeliveredFalse(ids);
