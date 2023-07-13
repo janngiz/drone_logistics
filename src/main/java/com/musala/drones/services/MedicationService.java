@@ -69,7 +69,6 @@ public class MedicationService {
         return medicationRepository.findAll();
     }
 
-
     public Medication updateMedication(String id, String name, String weight, String code, MultipartFile file) {
         try {
             if (StringUtils.isNullOrEmpty(id)) {

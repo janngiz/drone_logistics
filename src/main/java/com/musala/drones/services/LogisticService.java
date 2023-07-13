@@ -28,6 +28,10 @@ public class LogisticService {
             throw new ValidationException("At least one medication required.");
         }
 
+        if(drone.getState() != DroneState.IDLE){
+            throw new ValidationException("Drone is not available to load or not in IDLE state, id:" + droneId);
+        }
+
         //Prevent the drone from being in LOADING state if the battery level is below 25%;
         if (drone.getBatteryCapacity() < 25) {
             throw new ValidationException("Drone cannot be loaded below battery percentage 25.");
@@ -78,6 +82,10 @@ public class LogisticService {
 
     }
 
+    public List<Medication> getAvailableMedicationsForLoading() {
+        return medicationRepository.findAllByIsDeliveredFalseAndDroneIdIsNullOrIsEmpty();
+
+    }
     public int getBatteryOfDrone(String id) {
         Drone drone = LogisticUtils.getDrone(droneRepository, id);
         return drone.getBatteryCapacity();

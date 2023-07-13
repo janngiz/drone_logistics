@@ -34,10 +34,16 @@ public class LogisticController {
         return ResponseEntity.ok(loadedMedicationByDroneId);
     }
 
-    @GetMapping("/drones/available")
+    @GetMapping("/available/drones")
     public ResponseEntity<List<Drone>> getAvailableDronesForLoading(){
         List<Drone> availableDronesForLoading = logisticService.getAvailableDronesForLoading();
         return ResponseEntity.ok(availableDronesForLoading);
+    }
+
+    @GetMapping("/available/medications")
+    public ResponseEntity<List<Medication>> getAvailableMedicationsForLoading(){
+        List<Medication> availableMedicationsForLoading = logisticService.getAvailableMedicationsForLoading();
+        return ResponseEntity.ok(availableMedicationsForLoading);
     }
 
     @GetMapping("/drone/{droneId}/battery")
