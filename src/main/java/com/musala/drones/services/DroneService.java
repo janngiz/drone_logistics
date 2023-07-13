@@ -40,7 +40,6 @@ public class DroneService {
         Drone drone = LogisticUtils.getDrone(droneRepository, id);
         drone.setSerialNumber(updatedDrone.getSerialNumber());
         drone.setModel(updatedDrone.getModel());
-        drone.setWeightLimit(updatedDrone.getWeightLimit());
         drone.setBatteryCapacity(updatedDrone.getBatteryCapacity());
         drone.setState(updatedDrone.getState());
         return droneRepository.save(drone);
